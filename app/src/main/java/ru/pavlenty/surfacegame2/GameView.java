@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -24,9 +23,10 @@ public class GameView extends SurfaceView implements Runnable {
 
     private Player player;
     private Enemy enemy;
+    private Friend friend;
     private Bitmap boom;
 
-    int boomX = -100, boomY = -100;
+    int boomX = -1, boomY = -1;
 
     private Paint paint;
     private Canvas canvas;
@@ -54,6 +54,7 @@ public class GameView extends SurfaceView implements Runnable {
     static MediaPlayer gameOnsound;
     final MediaPlayer killedEnemysound;
     final MediaPlayer gameOversound;
+    final int scoreDecrease = 200;
 
     Context context;
 
@@ -63,6 +64,7 @@ public class GameView extends SurfaceView implements Runnable {
         boom = BitmapFactory.decodeResource(context.getResources(), R.drawable.boom);
         player = new Player(context, screenX, screenY);
         enemy = new Enemy(context, screenX, screenY);
+        friend = new Friend(context, screenX, screenY);
 
         surfaceHolder = getHolder();
         paint = new Paint();
@@ -92,7 +94,6 @@ public class GameView extends SurfaceView implements Runnable {
         gameOnsound = MediaPlayer.create(context,R.raw.gameon);
         killedEnemysound = MediaPlayer.create(context,R.raw.killedenemy);
         gameOversound = MediaPlayer.create(context,R.raw.gameover);
-
 
         gameOnsound.start();
     }
@@ -154,6 +155,11 @@ public class GameView extends SurfaceView implements Runnable {
                     enemy.getX(),
                     enemy.getY(),
                     paint);
+            canvas.drawBitmap(
+                    friend.getBitmap(),
+                    friend.getX(),
+                    friend.getY(),
+                    paint);
             if (boomX >= 0 && boomY >= 0) {
                 canvas.drawBitmap(
                         boom,
@@ -161,7 +167,6 @@ public class GameView extends SurfaceView implements Runnable {
                         boomY,
                         paint);
             }
-
 
             if(isGameOver){
                 paint.setTextSize(150);
@@ -175,31 +180,52 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-
     public static void stopMusic(){
         gameOnsound.stop();
     }
 
     private void update() {
-        score++;
+        scoreUp();
 
         player.update();
         enemy.update();
+        friend.update();
 
+        ifCollision();
+
+        for (Star s : stars) {
+            s.update(player.getSpeed());
+        }
+
+        if (score < 0) {
+            //gameOver();
+        }
+    }
+
+    private void ifCollision() {
         if (Rect.intersects(player.getDetectCollision(), enemy.getDetectCollision())) {
-            Log.d("RRR", "Collision!!!");
 
-            boomX = player.getDetectCollision().right - 250;
+            boomX = player.getDetectCollision().right - player.getBitmap().getWidth() / 4 * 3;
             boomY = player.getDetectCollision().top;
+            startGameOverSound();
+            scoreDown();
         }
         else {
             boomX = -1;
             boomY = -1;
         }
+    }
 
-        for (Star s : stars) {
-            s.update(player.getSpeed());
-        }
+    private void startGameOverSound() {
+        gameOversound.start();
+    }
+
+    private void scoreDown() {
+        score -= scoreDecrease;
+    }
+
+    private void scoreUp() {
+        score++;
     }
 
     private void control() {
@@ -215,6 +241,7 @@ public class GameView extends SurfaceView implements Runnable {
         try {
             gameThread.join();
         } catch (InterruptedException e) {
+
         }
     }
 
@@ -222,5 +249,9 @@ public class GameView extends SurfaceView implements Runnable {
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void gameOver() {
+        isGameOver = true;
     }
 }

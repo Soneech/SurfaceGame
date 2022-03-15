@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 
-public class Enemy {
+public class Friend {
     private Bitmap bitmap;
     private int x;
     private int y;
@@ -17,19 +17,15 @@ public class Enemy {
     private final int MIN_SPEED = 3;
     private final int MAX_SPEED = 20;
 
-    private Rect detectCollision;
-
-    public Enemy(Context context, int screenX, int screenY) {
+    public Friend(Context context, int screenX, int screenY) {
         speed = randomSpeed();
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.friend);
         maxY = screenY - bitmap.getHeight();
         minY = 0;
         maxX = screenX;
 
         x = screenX;
         y = randomHeight();
-
-        detectCollision =  new Rect(x, y, bitmap.getWidth(), bitmap.getHeight());
     }
 
     public void update() {
@@ -54,11 +50,6 @@ public class Enemy {
             y = randomHeight();
             speed = randomSpeed();
         }
-
-        detectCollision.left = x;
-        detectCollision.top = y;
-        detectCollision.right = x + bitmap.getWidth();
-        detectCollision.bottom = y + bitmap.getHeight();
     }
 
     public int randomHeight() {
@@ -67,10 +58,6 @@ public class Enemy {
 
     public int randomSpeed() {
         return (int)(Math.random() * MAX_SPEED);
-    }
-
-    public Rect getDetectCollision() {
-        return detectCollision;
     }
 
     public Bitmap getBitmap() {
