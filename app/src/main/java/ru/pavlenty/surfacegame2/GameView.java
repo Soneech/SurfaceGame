@@ -3,11 +3,14 @@ package ru.pavlenty.surfacegame2;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -18,7 +21,12 @@ public class GameView extends SurfaceView implements Runnable {
 
     volatile boolean playing;
     private Thread gameThread = null;
+
     private Player player;
+    private Enemy enemy;
+    private Bitmap boom;
+
+    int boomX = -100, boomY = -100;
 
     private Paint paint;
     private Canvas canvas;
@@ -51,7 +59,10 @@ public class GameView extends SurfaceView implements Runnable {
 
     public GameView(Context context, int screenX, int screenY) {
         super(context);
+
+        boom = BitmapFactory.decodeResource(context.getResources(), R.drawable.boom);
         player = new Player(context, screenX, screenY);
+        enemy = new Enemy(context, screenX, screenY);
 
         surfaceHolder = getHolder();
         paint = new Paint();
@@ -138,6 +149,18 @@ public class GameView extends SurfaceView implements Runnable {
                     player.getX(),
                     player.getY(),
                     paint);
+            canvas.drawBitmap(
+                    enemy.getBitmap(),
+                    enemy.getX(),
+                    enemy.getY(),
+                    paint);
+            if (boomX >= 0 && boomY >= 0) {
+                canvas.drawBitmap(
+                        boom,
+                        boomX,
+                        boomY,
+                        paint);
+            }
 
 
             if(isGameOver){
@@ -149,7 +172,6 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
-
         }
     }
 
@@ -162,7 +184,18 @@ public class GameView extends SurfaceView implements Runnable {
         score++;
 
         player.update();
+        enemy.update();
 
+        if (Rect.intersects(player.getDetectCollision(), enemy.getDetectCollision())) {
+            Log.d("RRR", "Collision!!!");
+
+            boomX = player.getDetectCollision().right - 250;
+            boomY = player.getDetectCollision().top;
+        }
+        else {
+            boomX = -1;
+            boomY = -1;
+        }
 
         for (Star s : stars) {
             s.update(player.getSpeed());
@@ -190,6 +223,4 @@ public class GameView extends SurfaceView implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
-
-
 }

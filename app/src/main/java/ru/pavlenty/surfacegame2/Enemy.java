@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 
-public class Player {
+public class Enemy {
     private Bitmap bitmap;
     private int x;
     private int y;
@@ -15,39 +15,23 @@ public class Player {
     private int maxY;
     private int minY;
 
-    private final int MIN_SPEED = 1;
+    private final int MIN_SPEED = 3;
     private final int MAX_SPEED = 20;
 
     private Rect detectCollision;
 
-    public Player(Context context, int screenX, int screenY) {
-        x = 75;
-        y = 50;
-        speed = 1;
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
+    public Enemy(Context context, int screenX, int screenY) {
+        x = 900;
+        y = 600;
+        speed = 3;
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
         maxY = screenY - bitmap.getHeight();
         minY = 0;
-        boosting = false;
 
         detectCollision =  new Rect(x, y, bitmap.getWidth(), bitmap.getHeight());
-
-    }
-
-    public void setBoosting() {
-        boosting = true;
-    }
-
-    public void stopBoosting() {
-        boosting = false;
     }
 
     public void update() {
-        if (boosting) {
-            speed += 2;
-        } else {
-            speed -= 5;
-        }
-
         if (speed > MAX_SPEED) {
             speed = MAX_SPEED;
         }
@@ -56,7 +40,7 @@ public class Player {
             speed = MIN_SPEED;
         }
 
-        y -= speed + GRAVITY;
+        x -= speed;
 
         if (y < minY) {
             y = minY;

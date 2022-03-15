@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SurfaceFix.iml" filepath="$PROJECT_DIR$/.idea/modules/SurfaceFix.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SurfaceFix.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SurfaceFix.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SurfaceGame.iml" filepath="$PROJECT_DIR$/.idea/modules/SurfaceGame.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SurfaceGame.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SurfaceGame.app.iml" />
     </modules>
   </component>
 </project>
